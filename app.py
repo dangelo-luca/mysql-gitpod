@@ -7,6 +7,47 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
 import uuid
+import mysql.connector
+
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="",
+  database = "events"
+)
+
+mycursor = mydb.cursor()
+mycursor.execute("CREATE DATABASE IF NOT EXISTS events")
+
+mycursor.execute("""CREATE TABLE IF NOT EXISTS users (
+    id INTEGER NOT NULL, 
+	username VARCHAR(80) NOT NULL, 
+	password VARCHAR(120) NOT NULL, 
+	created_at DATETIME, 
+	last_login DATETIME, 
+	is_active BOOLEAN,  
+	PRIMARY KEY (id), 
+	UNIQUE (username));""")
+
+
+mycursor.execute("""CREATE TABLE events (
+	id INTEGER NOT NULL, 
+	title VARCHAR(200) NOT NULL, 
+	content TEXT NOT NULL, 
+	date DATE NOT NULL, 
+	location VARCHAR(200), 
+	created_at DATETIME, 
+	updated_at DATETIME, 
+	tags VARCHAR(200), 
+	is_important BOOLEAN, 
+	images TEXT, 
+	created_by INTEGER, 
+	updated_by INTEGER, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(created_by) REFERENCES users (id), 
+	FOREIGN KEY(updated_by) REFERENCES users (id)
+);""")
+
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
